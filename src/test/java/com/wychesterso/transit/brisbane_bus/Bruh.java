@@ -2,14 +2,16 @@ package com.wychesterso.transit.brisbane_bus;
 
 import com.wychesterso.transit.brisbane_bus.gtfs.RouteLoader;
 import com.wychesterso.transit.brisbane_bus.gtfs.StopLoader;
+import com.wychesterso.transit.brisbane_bus.gtfs.StopTimeLoader;
 import com.wychesterso.transit.brisbane_bus.gtfs.TripLoader;
 import com.wychesterso.transit.brisbane_bus.model.Route;
 import com.wychesterso.transit.brisbane_bus.model.Stop;
+import com.wychesterso.transit.brisbane_bus.model.StopTime;
 import com.wychesterso.transit.brisbane_bus.model.Trip;
 
 public class Bruh {
     public static void main(String[] args) {
-        printTrips();
+        printStopTimes();
     }
 
     private static void printStops() {
@@ -36,6 +38,16 @@ public class Bruh {
         try {
             for (Trip trip : TripLoader.loadTrips()) {
                 System.out.println(trip);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void printStopTimes() {
+        try {
+            for (StopTime stopTime : StopTimeLoader.loadStopTimes()) {
+                System.out.println(stopTime);
             }
         } catch (Exception e) {
             e.printStackTrace();
