@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+*.hprof
+src/main/resources/static/SEQ_GTFS/
