@@ -6,11 +6,9 @@ import com.wychesterso.transit.brisbane_bus.model.Route;
 import com.wychesterso.transit.brisbane_bus.repository.RouteRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
 
 @Component
 public class RouteLoader {
@@ -45,10 +43,5 @@ public class RouteLoader {
                 );
             }
         }
-    }
-
-    @GetMapping("/routes")
-    public List<Route> routes() {
-        return routeRepository.findAll();
     }
 }

@@ -40,9 +40,9 @@ public class Bruh {
 
     private static void printStopTimes() {
         try {
-            for (StopTime stopTime : StopTimeLoader.loadStopTimes()) {
-                System.out.println(stopTime);
-            }
+//            for (StopTime stopTime : StopTimeLoader.loadStopTimes()) {
+//                System.out.println(stopTime);
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
