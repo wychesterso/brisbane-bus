@@ -30,9 +30,9 @@ public class Bruh {
 
     private static void printTrips() {
         try {
-            for (Trip trip : TripLoader.loadTrips()) {
-                System.out.println(trip);
-            }
+//            for (Trip trip : TripLoader.loadTrips()) {
+//                System.out.println(trip);
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }

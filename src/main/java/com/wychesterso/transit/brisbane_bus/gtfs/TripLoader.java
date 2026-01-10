@@ -1,37 +1,82 @@
 package com.wychesterso.transit.brisbane_bus.gtfs;
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvValidationException;
-import com.wychesterso.transit.brisbane_bus.model.Trip;
+import org.postgresql.PGConnection;
+import org.postgresql.copy.CopyManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.Statement;
 
+@Component
 public class TripLoader {
-    public static List<Trip> loadTrips() throws IOException, CsvValidationException {
-        List<Trip> trips = new ArrayList<>();
 
-        try (CSVReader reader = new CSVReader(
-                new FileReader("src/main/resources/static/SEQ_GTFS/trips.txt"))) {
+    private final DataSource dataSource;
+    private static final Logger log = LoggerFactory.getLogger(TripLoader.class);
 
-            reader.readNext();
-            String[] row;
+    public TripLoader(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
-            while ((row = reader.readNext()) != null) {
-                trips.add(new Trip(
-                        row[2],
-                        row[0],
-                        row[1],
-                        row[3],
-                        LoadHelper.parseInteger(row[4]),
-                        row[5],
-                        row[6]
-                ));
+    public void loadTrips() throws Exception {
+
+        long start = System.currentTimeMillis();
+        log.info("Starting TripLoader...");
+
+        try (Connection conn = dataSource.getConnection()) {
+
+            try (Statement st = conn.createStatement()) {
+                st.execute("SET synchronous_commit = OFF");
             }
-        }
 
-        return trips;
+            PGConnection pg = conn.unwrap(PGConnection.class);
+            CopyManager copy = pg.getCopyAPI();
+
+            // drop indexes to speed up bulk insert
+            try (Statement st = conn.createStatement()) {
+                log.info("Dropping indexes...");
+                // st.execute("DROP INDEX IF EXISTS idx_stop_times_stop_arrival");
+            }
+
+            // copy raw csv to staging
+            log.info("Starting COPY trips...");
+            long copyStart = System.currentTimeMillis();
+
+            try (FileReader reader = new FileReader(
+                    "src/main/resources/static/SEQ_GTFS/trips.txt")) {
+
+                long rows = copy.copyIn("""
+                    COPY trips (
+                        route_id,
+                        service_id,
+                        trip_id,
+                        trip_headsign,
+                        direction_id,
+                        block_id,
+                        shape_id
+                    )
+                    FROM STDIN WITH (FORMAT csv, HEADER true)
+                """, reader);
+
+                log.info("COPY trips finished: {} rows in {} ms",
+                        rows, System.currentTimeMillis() - copyStart);
+            }
+
+            // recreate indexes
+            try (Statement st = conn.createStatement()) {
+                log.info("Recreating indexes...");
+//                st.execute("""
+//                    CREATE INDEX IF NOT EXISTS idx_stop_times_stop_arrival
+//                    ON stop_times (stop_id, arrival_time);
+//                """);
+                log.info("Indexes recreated");
+            }
+
+            log.info("TripLoader finished in {} ms",
+                    System.currentTimeMillis() - start);
+        }
     }
 }
