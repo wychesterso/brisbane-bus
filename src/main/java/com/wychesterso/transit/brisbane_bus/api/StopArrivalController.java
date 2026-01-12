@@ -21,7 +21,7 @@ public class StopArrivalController {
     public List<StopArrivalResponse> getArrivalsForRouteAtStop(
             @PathVariable String stopId,
             @RequestParam(required = false) String routeId) {
-        if (routeId != null) {
+        if (routeId == null) {
             return arrivalService.getNextArrivalsForStop(stopId);
         }
         return arrivalService.getNextArrivalsForRouteAtStop(stopId, routeId);
