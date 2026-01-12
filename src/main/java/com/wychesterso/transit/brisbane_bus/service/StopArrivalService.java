@@ -3,11 +3,12 @@ package com.wychesterso.transit.brisbane_bus.service;
 import com.wychesterso.transit.brisbane_bus.dto.StopArrivalDTO;
 import com.wychesterso.transit.brisbane_bus.dto.StopArrivalResponse;
 import com.wychesterso.transit.brisbane_bus.repository.StopArrivalRepository;
+import com.wychesterso.transit.brisbane_bus.service.time.ServiceClock;
+import com.wychesterso.transit.brisbane_bus.service.time.ServiceTimeHelper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -25,17 +26,27 @@ public class StopArrivalService {
     }
 
     public List<StopArrivalResponse> getNextArrivalsForStop(String stopId) {
-        int nowSeconds = LocalTime.now(BRISBANE).toSecondOfDay();
-        return mapDTOtoResponse(repository.findNextArrivalsForStop(stopId, nowSeconds));
+        ServiceClock clock = ServiceTimeHelper.now();
+        int nowSeconds = clock.serviceSeconds();
+
+        return mapDTOtoResponse(
+                repository.findNextArrivalsForStop(stopId, nowSeconds),
+                clock
+        );
     }
 
     public List<StopArrivalResponse> getNextArrivalsForRouteAtStop(String stopId, String routeId) {
-        int nowSeconds = LocalTime.now(BRISBANE).toSecondOfDay();
-        return mapDTOtoResponse(repository.findNextArrivalsForRouteAtStop(stopId, routeId, nowSeconds));
+        ServiceClock clock = ServiceTimeHelper.now();
+        int nowSeconds = clock.serviceSeconds();
+
+        return mapDTOtoResponse(
+                repository.findNextArrivalsForRouteAtStop(stopId, routeId, nowSeconds),
+                clock
+        );
     }
 
-    private List<StopArrivalResponse> mapDTOtoResponse(List<StopArrivalDTO> arrivals) {
-        LocalDate serviceDate = LocalDate.now(BRISBANE);
+    private List<StopArrivalResponse> mapDTOtoResponse(List<StopArrivalDTO> arrivals, ServiceClock clock) {
+        LocalDate serviceDate = clock.serviceDate();
 
         return arrivals.stream()
                 .map(r -> {
