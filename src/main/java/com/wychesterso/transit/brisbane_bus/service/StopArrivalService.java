@@ -28,25 +28,26 @@ public class StopArrivalService {
     public List<StopArrivalResponse> getNextArrivalsForStop(String stopId) {
         ServiceClock clock = ServiceTimeHelper.now();
         int nowSeconds = clock.serviceSeconds();
+        LocalDate serviceDate = clock.serviceDate();
 
         return mapDTOtoResponse(
                 repository.findNextArrivalsForStop(stopId, nowSeconds),
-                clock
+                serviceDate
         );
     }
 
     public List<StopArrivalResponse> getNextArrivalsForRouteAtStop(String stopId, String routeId) {
         ServiceClock clock = ServiceTimeHelper.now();
         int nowSeconds = clock.serviceSeconds();
+        LocalDate serviceDate = clock.serviceDate();
 
         return mapDTOtoResponse(
-                repository.findNextArrivalsForRouteAtStop(stopId, routeId, nowSeconds),
-                clock
+                repository.findNextArrivalsForRouteAtStop(stopId, routeId, serviceDate, nowSeconds),
+                serviceDate
         );
     }
 
-    private List<StopArrivalResponse> mapDTOtoResponse(List<StopArrivalDTO> arrivals, ServiceClock clock) {
-        LocalDate serviceDate = clock.serviceDate();
+    private List<StopArrivalResponse> mapDTOtoResponse(List<StopArrivalDTO> arrivals, LocalDate serviceDate) {
 
         return arrivals.stream()
                 .map(r -> {

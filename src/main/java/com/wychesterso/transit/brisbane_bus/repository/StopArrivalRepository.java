@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -17,8 +18,8 @@ public interface StopArrivalRepository extends JpaRepository<StopTime, StopTimeI
         value = """
             SELECT
                 st.trip_id        AS tripId,
-                st.arrival_time   AS arrivalTime,
-                st.departure_time AS departureTime
+                st.arrival_time   AS arrivalTimeSeconds,
+                st.departure_time AS departureTimeSeconds
             FROM stop_times st
             WHERE st.stop_id = :stopId
                 AND st.arrival_time >= :now
@@ -38,8 +39,8 @@ public interface StopArrivalRepository extends JpaRepository<StopTime, StopTimeI
                 SELECT service_id
                 FROM calendar
                 WHERE
-                    start_date <= CURRENT_DATE
-                    AND end_date >= CURRENT_DATE
+                    start_date <= :serviceDate
+                    AND end_date >= :serviceDate
                     AND CASE EXTRACT(DOW FROM CURRENT_DATE)
                         WHEN 0 THEN sunday
                         WHEN 1 THEN monday
@@ -54,14 +55,14 @@ public interface StopArrivalRepository extends JpaRepository<StopTime, StopTimeI
         
                 SELECT service_id
                 FROM calendar_dates
-                WHERE date = CURRENT_DATE
+                WHERE date = :serviceDate
                     AND exception_type = 1
         
                 EXCEPT
         
                 SELECT service_id
                 FROM calendar_dates
-                WHERE date = CURRENT_DATE
+                WHERE date = :serviceDate
                 AND exception_type = 2
             )
         
@@ -83,6 +84,7 @@ public interface StopArrivalRepository extends JpaRepository<StopTime, StopTimeI
     List<StopArrivalDTO> findNextArrivalsForRouteAtStop(
             @Param("stopId") String stopId,
             @Param("routeId") String routeId,
+            @Param("serviceDate") LocalDate serviceDate,
             @Param("now") int now
     );
 }
