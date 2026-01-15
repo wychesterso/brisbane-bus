@@ -1,4 +1,4 @@
-package com.wychesterso.transit.brisbane_bus.dto;
+package com.wychesterso.transit.brisbane_bus.api.dto;
 
 public interface StopArrivalDTO {
     String getTripId();

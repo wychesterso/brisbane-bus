@@ -1,6 +1,5 @@
 package com.wychesterso.transit.brisbane_bus;
 
-import com.wychesterso.transit.brisbane_bus.gtfs.*;
 import com.wychesterso.transit.brisbane_bus.model.*;
 
 public class Bruh {

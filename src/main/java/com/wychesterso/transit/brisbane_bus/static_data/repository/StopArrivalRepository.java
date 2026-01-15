@@ -1,14 +1,13 @@
-package com.wychesterso.transit.brisbane_bus.repository;
+package com.wychesterso.transit.brisbane_bus.static_data.repository;
 
-import com.wychesterso.transit.brisbane_bus.dto.StopArrivalDTO;
-import com.wychesterso.transit.brisbane_bus.model.StopTime;
-import com.wychesterso.transit.brisbane_bus.model.StopTimeId;
+import com.wychesterso.transit.brisbane_bus.api.dto.StopArrivalDTO;
+import com.wychesterso.transit.brisbane_bus.static_data.model.StopTime;
+import com.wychesterso.transit.brisbane_bus.static_data.model.StopTimeId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Repository

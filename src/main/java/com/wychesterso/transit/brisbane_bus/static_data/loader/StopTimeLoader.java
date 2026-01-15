@@ -1,4 +1,4 @@
-package com.wychesterso.transit.brisbane_bus.gtfs;
+package com.wychesterso.transit.brisbane_bus.static_data.loader;
 
 import org.postgresql.PGConnection;
 import org.postgresql.copy.CopyManager;
@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
-import java.io.FileReader;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;

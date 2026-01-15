@@ -1,4 +1,4 @@
-package com.wychesterso.transit.brisbane_bus.service.time;
+package com.wychesterso.transit.brisbane_bus.api.service.time;
 
 import java.time.LocalDate;
 

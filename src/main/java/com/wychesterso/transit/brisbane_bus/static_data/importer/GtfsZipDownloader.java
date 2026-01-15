@@ -1,11 +1,9 @@
-package com.wychesterso.transit.brisbane_bus.importer;
+package com.wychesterso.transit.brisbane_bus.static_data.importer;
 
-import com.wychesterso.transit.brisbane_bus.gtfs.RouteLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
