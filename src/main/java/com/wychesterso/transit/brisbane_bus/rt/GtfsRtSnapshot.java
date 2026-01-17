@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Responsible for holding the most recent, consistent GTFS-RT feed
+ */
 @Component
 public class GtfsRtSnapshot {
 
