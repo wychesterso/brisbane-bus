@@ -1,6 +1,6 @@
 package com.wychesterso.transit.brisbane_bus.api.controller;
 
-import com.wychesterso.transit.brisbane_bus.api.dto.StopArrivalResponse;
+import com.wychesterso.transit.brisbane_bus.api.dto.ArrivalResponse;
 import com.wychesterso.transit.brisbane_bus.api.service.StopArrivalService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +17,7 @@ public class StopArrivalController {
     }
 
     @GetMapping("/{stopId}/arrivals")
-    public List<StopArrivalResponse> getArrivalsForRouteAtStop(
+    public List<ArrivalResponse> getArrivalsForRouteAtStop(
             @PathVariable String stopId,
             @RequestParam(required = false) String routeId) {
         if (routeId == null) {

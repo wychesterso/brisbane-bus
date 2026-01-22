@@ -1,6 +1,6 @@
 package com.wychesterso.transit.brisbane_bus.api.dto;
 
-public record StopArrivalResponse(
+public record ArrivalResponse(
         String tripId,
 
         int scheduledArrivalSeconds,

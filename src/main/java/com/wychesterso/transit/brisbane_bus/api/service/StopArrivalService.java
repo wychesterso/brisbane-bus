@@ -1,8 +1,8 @@
 package com.wychesterso.transit.brisbane_bus.api.service;
 
 import com.wychesterso.transit.brisbane_bus.st.model.StopArrival;
-import com.wychesterso.transit.brisbane_bus.api.dto.StopArrivalResponse;
-import com.wychesterso.transit.brisbane_bus.api.dto.StopArrivalResponseList;
+import com.wychesterso.transit.brisbane_bus.api.dto.ArrivalResponse;
+import com.wychesterso.transit.brisbane_bus.api.dto.legacy.StopArrivalResponseList;
 import com.wychesterso.transit.brisbane_bus.rt.model.RtStopDelay;
 import com.wychesterso.transit.brisbane_bus.rt.model.TripStopKey;
 import com.wychesterso.transit.brisbane_bus.rt.service.GtfsRtIndexService;
@@ -39,7 +39,7 @@ public class StopArrivalService {
         this.redis = redis;
     }
 
-    public List<StopArrivalResponse> getNextArrivalsForStop(String stopId) {
+    public List<ArrivalResponse> getNextArrivalsForStop(String stopId) {
         ServiceClock clock = ServiceTimeHelper.now();
         int nowSeconds = clock.serviceSeconds();
         LocalDate serviceDate = clock.serviceDate();
@@ -50,7 +50,7 @@ public class StopArrivalService {
         );
     }
 
-    public List<StopArrivalResponse> getNextArrivalsForRouteAtStop(String stopId, String routeId) {
+    public List<ArrivalResponse> getNextArrivalsForRouteAtStop(String stopId, String routeId) {
         ServiceClock clock = ServiceTimeHelper.now();
         int nowSeconds = clock.serviceSeconds();
         LocalDate serviceDate = clock.serviceDate();
@@ -66,7 +66,7 @@ public class StopArrivalService {
             return cached.getArrivals();
         }
 
-        List<StopArrivalResponse> result = mapDTOtoResponse(
+        List<ArrivalResponse> result = mapDTOtoResponse(
                 repository.findNextArrivalsForRouteAtStop(
                         stopId,
                         routeId,
@@ -88,7 +88,7 @@ public class StopArrivalService {
         return result;
     }
 
-    private List<StopArrivalResponse> mapDTOtoResponse(List<StopArrival> arrivals, LocalDate serviceDate) {
+    private List<ArrivalResponse> mapDTOtoResponse(List<StopArrival> arrivals, LocalDate serviceDate) {
 
         Map<TripStopKey, RtStopDelay> rt = rtIndex.getIndex();
 
@@ -113,7 +113,7 @@ public class StopArrivalService {
                     LocalDateTime effectiveArr = serviceDate.atStartOfDay().plusSeconds(effectiveArrSeconds);
                     LocalDateTime effectiveDep = serviceDate.atStartOfDay().plusSeconds(effectiveDepSeconds);
 
-                    return new StopArrivalResponse(
+                    return new ArrivalResponse(
                             r.getTripId(),
                             r.getArrivalTimeSeconds(),
                             scheduledArr.format(TIME_FMT),

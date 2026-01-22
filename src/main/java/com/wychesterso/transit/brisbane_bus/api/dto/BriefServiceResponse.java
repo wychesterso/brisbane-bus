@@ -1,9 +1,8 @@
 package com.wychesterso.transit.brisbane_bus.api.dto;
 
-public record RouteResponse(
-        String routeId,
+public record BriefServiceResponse(
+        ServiceId routeGroup,
         String routeShortName,
         String routeLongName,
-        String routeColor,
-        String routeTextColor
+        ArrivalsAtStopResponse arrivalsAtNearestStop
 ) {}
