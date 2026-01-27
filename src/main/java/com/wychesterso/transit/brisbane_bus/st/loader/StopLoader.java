@@ -44,6 +44,12 @@ public class StopLoader {
             PGConnection pg = conn.unwrap(PGConnection.class);
             CopyManager copy = pg.getCopyAPI();
 
+            // drop indexes to speed up bulk insert
+            try (Statement st = conn.createStatement()) {
+                log.info("Dropping indexes...");
+                st.execute("DROP INDEX IF EXISTS idx_stops_lat_lon");
+            }
+
             // clear table
             log.info("Truncating stops...");
             try (Statement st = conn.createStatement()) {
@@ -75,6 +81,16 @@ public class StopLoader {
 
                 log.info("COPY stops finished: {} rows in {} ms",
                         rows, System.currentTimeMillis() - copyStart);
+            }
+
+            // recreate indexes
+            try (Statement st = conn.createStatement()) {
+                log.info("Recreating indexes...");
+                st.execute("""
+                    CREATE INDEX IF NOT EXISTS idx_stops_lat_lon
+                    ON stops (stop_lat, stop_lon);
+                """);
+                log.info("Indexes recreated");
             }
 
             log.info("StopLoader finished in {} ms",

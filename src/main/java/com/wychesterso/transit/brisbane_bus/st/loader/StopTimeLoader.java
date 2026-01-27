@@ -45,6 +45,8 @@ public class StopTimeLoader {
             // drop indexes to speed up bulk insert
             try (Statement st = conn.createStatement()) {
                 log.info("Dropping indexes...");
+                st.execute("DROP INDEX IF EXISTS idx_stop_times_stop_id");
+                st.execute("DROP INDEX IF EXISTS idx_stop_times_trip_id");
                 st.execute("DROP INDEX IF EXISTS idx_stop_times_stop_arrival");
             }
 
@@ -117,6 +119,10 @@ public class StopTimeLoader {
             try (Statement st = conn.createStatement()) {
                 log.info("Recreating indexes...");
                 st.execute("""
+                    CREATE INDEX IF NOT EXISTS idx_stop_times_stop_id
+                    ON stop_times (stop_id);
+                    CREATE INDEX IF NOT EXISTS idx_stop_times_trip_id
+                    ON stop_times (trip_id);
                     CREATE INDEX IF NOT EXISTS idx_stop_times_stop_arrival
                     ON stop_times (stop_id, arrival_time);
                 """);

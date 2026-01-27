@@ -1,58 +1,56 @@
 package com.wychesterso.transit.brisbane_bus.api.service;
 
+import com.wychesterso.transit.brisbane_bus.api.dto.ArrivalsAtStopResponse;
 import com.wychesterso.transit.brisbane_bus.api.dto.BriefServiceResponse;
-import com.wychesterso.transit.brisbane_bus.api.dto.BriefStopResponse;
 import com.wychesterso.transit.brisbane_bus.api.dto.ServiceId;
 import com.wychesterso.transit.brisbane_bus.st.model.ServiceGroup;
 import com.wychesterso.transit.brisbane_bus.st.repository.ServiceGroupRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ServiceGroupService {
 
     private final ServiceGroupRepository serviceGroupRepository;
-    private final StopService stopService;
+    private final ServiceStopLocator serviceStopLocator;
 
-    public ServiceGroupService(ServiceGroupRepository serviceGroupRepository, StopService stopService) {
+    public ServiceGroupService(
+            ServiceGroupRepository serviceGroupRepository,
+            ServiceStopLocator serviceStopLocator) {
         this.serviceGroupRepository = serviceGroupRepository;
-        this.stopService = stopService;
+        this.serviceStopLocator = serviceStopLocator;
     }
 
-    public List<BriefServiceResponse> getServicesByPrefix(String prefix) {
+    public List<BriefServiceResponse> getServicesByPrefix(String prefix, double lat, double lon) {
         if (prefix == null || prefix.isBlank()) return List.of();
 
         return serviceGroupRepository.getServicesByPrefix(prefix)
                 .stream()
-                .map(this::toResponse)
+                .map(sg -> toResponse(sg, lat, lon))
                 .toList();
     }
 
-    public List<BriefServiceResponse> getServicesAtStop(String stopId) {
+    public List<BriefServiceResponse> getServicesAtStop(String stopId, double lat, double lon) {
         return serviceGroupRepository.getServicesAtStop(stopId)
                 .stream()
-                .map(this::toResponse)
+                .map(sg -> toResponse(sg, lat, lon))
                 .toList();
     }
 
-    public List<BriefServiceResponse> getAdjacentServices(Double lat, Double lon) {
-        Map<ServiceId, BriefServiceResponse> unique = new LinkedHashMap<>();
+    public List<BriefServiceResponse> getServicesAtStops(List<String> stopIds, double lat, double lon) {
+        if (stopIds == null || stopIds.isEmpty()) return List.of();
 
-        for (BriefStopResponse stop : stopService.getAdjacentStops(lat, lon)) {
-            for (ServiceGroup service : serviceGroupRepository.getServicesAtStop(stop.stopId())) {
-                BriefServiceResponse response = toResponse(service);
-                unique.putIfAbsent(response.routeGroup(), response);
-            }
-        }
-
-        return new ArrayList<>(unique.values());
+        return serviceGroupRepository.getServicesAtStops(stopIds.toArray(new String[0]), lat, lon)
+                .stream()
+                .map(sg -> toResponse(sg, lat, lon))
+                .toList();
     }
 
-    private BriefServiceResponse toResponse(ServiceGroup serviceGroup) {
+    private BriefServiceResponse toResponse(
+            ServiceGroup serviceGroup,
+            double lat,
+            double lon) {
         return new BriefServiceResponse(
                 new ServiceId(
                         serviceGroup.getRouteShortName(),
@@ -61,7 +59,17 @@ public class ServiceGroupService {
                 ),
                 serviceGroup.getRouteShortName(),
                 serviceGroup.getRouteLongName(),
-                null // TODO: arrivalsAtNearestStop
+                new ArrivalsAtStopResponse(
+                        serviceStopLocator.getAdjacentStopForService(
+                                serviceGroup.getRouteShortName(),
+                                serviceGroup.getTripHeadsign(),
+                                serviceGroup.getDirectionId(),
+                                lat,
+                                lon
+                        ),
+                        null,
+                        null
+                ) // TODO: arrivalsAtNearestStop
         );
     }
 }

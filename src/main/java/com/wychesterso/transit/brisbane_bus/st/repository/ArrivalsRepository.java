@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface StopArrivalRepository extends JpaRepository<StopTime, String> {
+public interface ArrivalsRepository extends JpaRepository<StopTime, String> {
 
     @Query(
             value = """
@@ -72,8 +72,11 @@ public interface StopArrivalRepository extends JpaRepository<StopTime, String> {
                     st.departure_time AS departureTimeSeconds
                 FROM stop_times st
                 JOIN trips t ON t.trip_id = st.trip_id
+                JOIN routes r ON t.route_id = r.route_id
                 WHERE st.stop_id = :stopId
-                    AND t.route_id = :routeId
+                    AND r.route_short_name = :routeShortName
+                    AND r.trip_headsign = :tripHeadsign
+                    AND r.direction_id = :directionId
                     AND t.service_id IN (SELECT service_id FROM active_services)
                     AND st.arrival_time >= :now
                 ORDER BY st.arrival_time
@@ -81,9 +84,11 @@ public interface StopArrivalRepository extends JpaRepository<StopTime, String> {
             """,
             nativeQuery = true
     )
-    List<StopArrival> findNextArrivalsForRouteAtStop(
+    List<StopArrival> findNextArrivalsForServiceAtStop(
             @Param("stopId") String stopId,
-            @Param("routeId") String routeId,
+            @Param("routeShortName") String routeShortName,
+            @Param("tripHeadsign") String tripHeadsign,
+            @Param("directionId") Integer directionId,
             @Param("serviceDateInt") int serviceDateInt,
             @Param("now") int now
     );

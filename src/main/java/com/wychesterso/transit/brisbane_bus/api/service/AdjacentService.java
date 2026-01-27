@@ -1,0 +1,83 @@
+package com.wychesterso.transit.brisbane_bus.api.service;
+
+import com.wychesterso.transit.brisbane_bus.api.dto.BriefServiceResponse;
+import com.wychesterso.transit.brisbane_bus.api.dto.BriefStopResponse;
+import com.wychesterso.transit.brisbane_bus.api.dto.FullStopResponse;
+import com.wychesterso.transit.brisbane_bus.api.dto.ServiceId;
+import com.wychesterso.transit.brisbane_bus.st.loader.RouteLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class AdjacentService {
+
+    private final StopService stopService;
+    private final ServiceGroupService serviceGroupService;
+    private static final Logger log = LoggerFactory.getLogger(RouteLoader.class);
+
+    public AdjacentService(
+            StopService stopService,
+            ServiceGroupService serviceGroupService) {
+        this.stopService = stopService;
+        this.serviceGroupService = serviceGroupService;
+    }
+
+    public List<BriefServiceResponse> getAdjacentServices(Double lat, Double lon) {
+
+        long start = System.currentTimeMillis();
+        log.info("Starting getAdjacentStops...");
+        List<String> stopIds = stopService.getAdjacentStops(lat, lon)
+                .stream()
+                .map(BriefStopResponse::stopId)
+                .toList();
+        log.info("getAdjacentStops returned {} stops in {} ms",
+                stopIds.size(), System.currentTimeMillis() - start);
+
+        Map<ServiceId, BriefServiceResponse> unique = new LinkedHashMap<>();
+
+        start = System.currentTimeMillis();
+        log.info("Starting getServicesAtStops...");
+        List<BriefServiceResponse> services = serviceGroupService.getServicesAtStops(stopIds, lat, lon);
+        log.info("getServicesAtStops returned {} services for {} stops in {} ms",
+                services.size(), stopIds.size(), System.currentTimeMillis() - start);
+
+        for (BriefServiceResponse service : services) {
+            unique.putIfAbsent(service.routeGroup(), service);
+        }
+
+        return new ArrayList<>(unique.values());
+    }
+
+    public List<FullStopResponse> getAdjacentStopsFull(Double lat, Double lon) {
+        List<FullStopResponse> result = new ArrayList<>();
+
+        for (BriefStopResponse stop : stopService.getAdjacentStops(lat, lon)) {
+            result.add(new FullStopResponse(
+                    stop,
+                    serviceGroupService.getServicesAtStop(stop.stopId(), lat, lon)
+            ));
+        }
+
+        return result;
+    }
+
+    public BriefStopResponse getAdjacentStopForService(
+            String routeShortName,
+            String tripHeadsign,
+            int directionId,
+            Double lat,
+            Double lon) {
+        return stopService.getAdjacentStopForService(
+                routeShortName,
+                tripHeadsign,
+                directionId,
+                lat,
+                lon);
+    }
+}

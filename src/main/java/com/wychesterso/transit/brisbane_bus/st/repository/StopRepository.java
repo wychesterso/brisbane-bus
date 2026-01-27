@@ -20,6 +20,25 @@ public interface StopRepository extends JpaRepository<StopTime, String> {
                         stop_name AS stopName,
                         stop_lat AS stopLat,
                         stop_lon AS stopLon,
+                        zone_id AS zoneId
+                    FROM stops
+                    WHERE stop_id = :stopId
+                    LIMIT 1;
+                    """,
+            nativeQuery = true
+    )
+    Stop findStopById(
+            @Param("stopId") String stopId
+    );
+
+    @Query(
+            value = """
+                    SELECT
+                        stop_id AS stopId,
+                        stop_code AS stopCode,
+                        stop_name AS stopName,
+                        stop_lat AS stopLat,
+                        stop_lon AS stopLon,
                         zone_id as zoneId
                     FROM stops
                     WHERE
@@ -82,24 +101,6 @@ public interface StopRepository extends JpaRepository<StopTime, String> {
 
 
 
-
-    @Query(
-            value = """
-                SELECT
-                    stop_id AS stopId,
-                    stop_code AS stopCode,
-                    stop_name AS stopName,
-                    stop_lat AS stopLat,
-                    stop_lon AS stopLon,
-                    zone_id AS zoneId
-                FROM stops
-                WHERE stop_id = :stopId
-            """,
-            nativeQuery = true
-    )
-    List<Stop> findStopById(
-            @Param("stopId") String stopId
-    );
 
     @Query(
             value = """

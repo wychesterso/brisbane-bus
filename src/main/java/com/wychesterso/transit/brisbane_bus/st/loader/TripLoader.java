@@ -45,6 +45,8 @@ public class TripLoader {
             // drop indexes to speed up bulk insert
             try (Statement st = conn.createStatement()) {
                 log.info("Dropping indexes...");
+                st.execute("DROP INDEX IF EXISTS idx_trips_trip_id");
+                st.execute("DROP INDEX IF EXISTS idx_trips_route_id");
                 st.execute("DROP INDEX IF EXISTS idx_trips_trip_route");
             }
 
@@ -81,6 +83,10 @@ public class TripLoader {
             try (Statement st = conn.createStatement()) {
                 log.info("Recreating indexes...");
                 st.execute("""
+                    CREATE INDEX IF NOT EXISTS idx_trips_trip_id
+                    ON trips (trip_id);
+                    CREATE INDEX IF NOT EXISTS idx_trips_route_id
+                    ON trips (route_id);
                     CREATE INDEX IF NOT EXISTS idx_trips_trip_route
                     ON trips (trip_id, route_id);
                 """);

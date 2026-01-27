@@ -1,7 +1,6 @@
 package com.wychesterso.transit.brisbane_bus.api.service;
 
 import com.wychesterso.transit.brisbane_bus.api.dto.BriefStopResponse;
-import com.wychesterso.transit.brisbane_bus.api.exception.NotFoundException;
 import com.wychesterso.transit.brisbane_bus.st.model.Stop;
 import com.wychesterso.transit.brisbane_bus.st.repository.StopRepository;
 import org.springframework.stereotype.Service;
@@ -19,8 +18,12 @@ public class StopService {
         this.repository = repository;
     }
 
+    public BriefStopResponse getStopInfo(String stopId) {
+        return toResponse(repository.findStopById(stopId));
+    }
+
     public List<BriefStopResponse> getAdjacentStops(Double lat, Double lon) {
-        double lonDelta = 0.009 / Math.cos(Math.toRadians(lat));
+        double lonDelta = LATDELTA / Math.cos(Math.toRadians(lat));
 
         List<Stop> adjacentStops = repository.findAdjacentStops(
                 lat,
@@ -34,12 +37,25 @@ public class StopService {
         return adjacentStops.stream().map(this::toResponse).toList();
     }
 
-    public BriefStopResponse getStop(String stopId) {
-        return repository.findStopById(stopId)
-                .stream()
-                .findFirst()
-                .map(this::toResponse)
-                .orElseThrow(() -> new NotFoundException("Stop not found: " + stopId));
+    public BriefStopResponse getAdjacentStopForService(
+            String routeShortName,
+            String tripHeadsign,
+            int directionId,
+            Double lat,
+            Double lon) {
+        double lonDelta = LATDELTA / Math.cos(Math.toRadians(lat));
+
+        return toResponse(repository.findMostAdjacentStopForService(
+                routeShortName,
+                tripHeadsign,
+                directionId,
+                lat,
+                lon,
+                lat - LATDELTA,
+                lon - lonDelta,
+                lat + LATDELTA,
+                lon + lonDelta
+        ));
     }
 
     private BriefStopResponse toResponse(Stop s) {
