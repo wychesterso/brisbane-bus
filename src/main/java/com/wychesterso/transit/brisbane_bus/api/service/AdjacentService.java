@@ -60,12 +60,20 @@ public class AdjacentService {
     }
 
     public List<FullStopResponse> getAdjacentStopsFull(Double lat, Double lon) {
+
+        Map<String, BriefStopResponse> stopIdToResponse = stopService.getAdjacentStopsById(lat, lon);
+
         List<FullStopResponse> result = new ArrayList<>();
 
-        for (BriefStopResponse stop : stopService.getAdjacentStops(lat, lon)) {
+        for (Map.Entry<String, List<BriefServiceResponse>> entry :
+                serviceGroupService.getServicesAtStopsPerStop(
+                        stopIdToResponse.keySet().stream().toList(),
+                        lat,
+                        lon
+                ).entrySet()) {
             result.add(new FullStopResponse(
-                    stop,
-                    serviceGroupService.getServicesAtStop(stop.stopId(), lat, lon)
+                    stopIdToResponse.get(entry.getKey()),
+                    entry.getValue()
             ));
         }
 

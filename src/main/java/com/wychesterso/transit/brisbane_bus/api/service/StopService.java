@@ -10,11 +10,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class StopService {
 
-    private static final double LATDELTA = 0.009;
+    private static final double LATDELTA = 0.007;
 
     private final StopRepository repository;
     private final RedisTemplate<String, Object> redis;
@@ -41,7 +44,7 @@ public class StopService {
         redis.opsForValue().set(
                 key,
                 result,
-                Duration.ofSeconds(86400) // TTL
+                Duration.ofHours(24) // TTL
         );
 
         return result;
@@ -73,10 +76,25 @@ public class StopService {
         redis.opsForValue().set(
                 key,
                 new BriefStopResponseList(result),
-                Duration.ofSeconds(86400) // TTL
+                Duration.ofHours(24) // TTL
         );
 
         return result;
+    }
+
+    public Map<String, BriefStopResponse> getAdjacentStopsById(
+            Double lat,
+            Double lon
+    ) {
+        List<BriefStopResponse> adjacentStops = getAdjacentStops(lat, lon);
+
+        return adjacentStops
+                .stream()
+                .collect(Collectors.toMap(
+                        BriefStopResponse::stopId,
+                        Function.identity(),
+                        (a, b) -> a
+                ));
     }
 
     public BriefStopResponse getAdjacentStopForService(
