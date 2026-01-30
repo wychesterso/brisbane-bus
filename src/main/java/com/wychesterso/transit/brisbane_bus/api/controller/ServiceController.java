@@ -25,12 +25,18 @@ public class ServiceController {
         this.adjacentService = adjacentService;
     }
 
-    @GetMapping("")
+    @GetMapping("/prefix")
     public List<BriefServiceResponse> getServicesByPrefix(
             @RequestParam(required = true) String prefix,
             @RequestParam(required = true) Double lat,
             @RequestParam(required = true) Double lon) {
         return serviceGroupService.getServicesByPrefix(prefix, lat, lon);
+    }
+
+    @GetMapping("/stop")
+    public List<BriefServiceResponse> getServicesAtStop(
+            @RequestParam(required = true) String id) {
+        return serviceGroupService.getServicesAtStop(id);
     }
 
     @GetMapping("/nearest")
@@ -40,9 +46,11 @@ public class ServiceController {
         return adjacentService.getAdjacentServices(lat, lon);
     }
 
-    @GetMapping("/{routeShortName}/{directionId}")
+    @GetMapping("/info")
     public FullServiceResponse getFullServiceInfo(
-            @RequestParam(required = true) String tripHeadsign) {
+            @RequestParam(required = true) String route,
+            @RequestParam(required = true) String headsign,
+            @RequestParam(required = true) Integer direction) {
         // TODO
         return null;
     }

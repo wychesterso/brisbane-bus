@@ -1,8 +1,7 @@
 package com.wychesterso.transit.brisbane_bus.api.service;
 
-import com.wychesterso.transit.brisbane_bus.api.dto.ArrivalsAtStopResponse;
 import com.wychesterso.transit.brisbane_bus.api.dto.BriefStopResponse;
-import com.wychesterso.transit.brisbane_bus.api.service.cache.BriefStopResponseList;
+import com.wychesterso.transit.brisbane_bus.api.cache.dto.BriefStopResponseList;
 import com.wychesterso.transit.brisbane_bus.st.model.Stop;
 import com.wychesterso.transit.brisbane_bus.st.repository.StopRepository;
 import org.springframework.data.redis.core.RedisTemplate;

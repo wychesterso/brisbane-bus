@@ -21,9 +21,9 @@ public class StopController {
     }
 
     @GetMapping("/nearest")
-    public List<FullStopResponse> getNearestStops(
+    public List<BriefStopResponse> getNearestStops(
             @RequestParam(required = true) Double lat,
             @RequestParam(required = true) Double lon) {
-        return adjacentService.getAdjacentStopsFull(lat, lon);
+        return adjacentService.getAdjacentStopsBrief(lat, lon);
     }
 }

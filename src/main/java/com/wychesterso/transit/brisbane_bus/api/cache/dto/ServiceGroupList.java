@@ -1,4 +1,4 @@
-package com.wychesterso.transit.brisbane_bus.api.service.cache;
+package com.wychesterso.transit.brisbane_bus.api.cache.dto;
 
 import java.util.List;
 

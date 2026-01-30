@@ -1,6 +1,6 @@
 package com.wychesterso.transit.brisbane_bus.api.service;
 
-import com.wychesterso.transit.brisbane_bus.api.service.cache.CanonicalStopSequence;
+import com.wychesterso.transit.brisbane_bus.api.cache.dto.CanonicalStopSequence;
 import com.wychesterso.transit.brisbane_bus.st.model.ServiceGroup;
 import com.wychesterso.transit.brisbane_bus.st.model.StopList;
 import com.wychesterso.transit.brisbane_bus.st.repository.TripRepository;
