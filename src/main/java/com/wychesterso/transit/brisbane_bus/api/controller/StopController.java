@@ -17,6 +17,13 @@ public class StopController {
         this.stopService = stopService;
     }
 
+    /**
+     * Retrieves a list of stops within a certain range of a query coordinate. <br>
+     * The results are sorted based on the stop's proximity to the query coordinates.
+     * @param lat the query latitude
+     * @param lon the query longitude
+     * @return a list of stop responses
+     */
     @GetMapping("/nearest")
     public List<BriefStopResponse> getNearestStops(
             @RequestParam(required = true) Double lat,

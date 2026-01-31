@@ -52,7 +52,7 @@ public class AdjacentService {
                 services.size(), stopIds.size(), System.currentTimeMillis() - start);
 
         for (BriefServiceResponse service : services) {
-            unique.putIfAbsent(service.routeGroup(), service);
+            unique.putIfAbsent(service.serviceGroup(), service);
         }
 
         return new ArrayList<>(unique.values());

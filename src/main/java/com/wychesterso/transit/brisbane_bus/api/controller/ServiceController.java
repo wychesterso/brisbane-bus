@@ -29,6 +29,19 @@ public class ServiceController {
         this.adjacentService = adjacentService;
     }
 
+    /**
+     * Retrieves a list of service groups, filtered by a prefix search term. <br>
+     * Each service group response contains: <br>
+     * - Route info <br>
+     * - The nearest stop that this service stops at (if in range) <br>
+     * - This service's next 3 arrivals at the nearest stop (if in range) <br>
+     * The results are sorted based on the nearest stop's proximity to the query coordinates. <br>
+     * Each service group can only appear once in the result.
+     * @param prefix the prefix search term
+     * @param lat the query latitude
+     * @param lon the query longitude
+     * @return a list of service group responses
+     */
     @GetMapping("/prefix")
     public List<BriefServiceResponse> getServicesByPrefix(
             @RequestParam(required = true) String prefix,
@@ -37,12 +50,33 @@ public class ServiceController {
         return serviceGroupWithArrivalsService.getServicesByPrefix(prefix, lat, lon);
     }
 
+    /**
+     * Retrieves a list of service groups that stop at a particular stop. <br>
+     * Each service group response contains: <br>
+     * - Route info <br>
+     * - This service's next 3 arrivals at the queried stop <br>
+     * Each service group can only appear once in the result.
+     * @param id the stop id to query
+     * @return a list of service group responses
+     */
     @GetMapping("/stop")
     public List<BriefServiceResponse> getServicesAtStop(
             @RequestParam(required = true) String id) {
         return serviceGroupWithArrivalsService.getServicesAtStop(id);
     }
 
+    /**
+     * Retrieves a list of service groups with a stop within a certain range of a query coordinate. <br>
+     * Each service group response contains: <br>
+     * - Route info <br>
+     * - The nearest stop that this service stops at <br>
+     * - This service's next 3 arrivals at the nearest stop <br>
+     * The results are sorted based on the nearest stop's proximity to the query coordinates. <br>
+     * Each service group can only appear once in the result.
+     * @param lat the query latitude
+     * @param lon the query longitude
+     * @return a list of service group responses
+     */
     @GetMapping("/nearest")
     public List<BriefServiceResponse> getNearestServices(
             @RequestParam(required = true) Double lat,
@@ -50,6 +84,14 @@ public class ServiceController {
         return adjacentService.getAdjacentServices(lat, lon);
     }
 
+    /**
+     * Retrieves service group info, stops and next 3 arrivals at each stop of this service. <br>
+     * The arrival results are sorted in stop sequence order.
+     * @param route the route number or short name
+     * @param headsign the service's headsign
+     * @param dir the service's direction id
+     * @return a full service response containing service info, stop sequence and arrivals
+     */
     @GetMapping("/info")
     public FullServiceResponse getFullServiceInfo(
             @RequestParam(required = true) String route,
