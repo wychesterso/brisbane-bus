@@ -1,6 +1,6 @@
 package com.wychesterso.transit.brisbane_bus.api.service;
 
-import com.wychesterso.transit.brisbane_bus.api.controller.dto.BriefServiceResponse;
+import com.wychesterso.transit.brisbane_bus.api.controller.dto.ServiceResponse;
 import com.wychesterso.transit.brisbane_bus.api.controller.dto.BriefStopResponse;
 import com.wychesterso.transit.brisbane_bus.api.controller.dto.ServiceGroup;
 import com.wychesterso.transit.brisbane_bus.st.loader.RouteLoader;
@@ -32,7 +32,7 @@ public class AdjacentService {
         this.redis = redis;
     }
 
-    public List<BriefServiceResponse> getAdjacentServices(Double lat, Double lon) {
+    public List<ServiceResponse> getAdjacentServices(Double lat, Double lon) {
 
         long start = System.currentTimeMillis();
         log.info("Starting getAdjacentStops...");
@@ -43,15 +43,15 @@ public class AdjacentService {
         log.info("getAdjacentStops returned {} stops in {} ms",
                 stopIds.size(), System.currentTimeMillis() - start);
 
-        Map<ServiceGroup, BriefServiceResponse> unique = new LinkedHashMap<>();
+        Map<ServiceGroup, ServiceResponse> unique = new LinkedHashMap<>();
 
         start = System.currentTimeMillis();
         log.info("Starting getServicesAtStops...");
-        List<BriefServiceResponse> services = serviceGroupWithArrivalsService.getServicesAtStops(stopIds, lat, lon);
+        List<ServiceResponse> services = serviceGroupWithArrivalsService.getServicesAtStops(stopIds, lat, lon);
         log.info("getServicesAtStops returned {} services for {} stops in {} ms",
                 services.size(), stopIds.size(), System.currentTimeMillis() - start);
 
-        for (BriefServiceResponse service : services) {
+        for (ServiceResponse service : services) {
             unique.putIfAbsent(service.serviceGroup(), service);
         }
 

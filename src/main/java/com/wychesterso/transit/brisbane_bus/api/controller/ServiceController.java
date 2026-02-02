@@ -1,6 +1,7 @@
 package com.wychesterso.transit.brisbane_bus.api.controller;
 
 import com.wychesterso.transit.brisbane_bus.api.controller.dto.BriefServiceResponse;
+import com.wychesterso.transit.brisbane_bus.api.controller.dto.ServiceResponse;
 import com.wychesterso.transit.brisbane_bus.api.controller.dto.FullServiceResponse;
 import com.wychesterso.transit.brisbane_bus.api.service.AdjacentService;
 import com.wychesterso.transit.brisbane_bus.api.service.ServiceGroupFullService;
@@ -38,16 +39,12 @@ public class ServiceController {
      * The results are sorted based on the nearest stop's proximity to the query coordinates. <br>
      * Each service group can only appear once in the result.
      * @param prefix the prefix search term
-     * @param lat the query latitude
-     * @param lon the query longitude
      * @return a list of service group responses
      */
     @GetMapping("/prefix")
     public List<BriefServiceResponse> getServicesByPrefix(
-            @RequestParam(required = true) String prefix,
-            @RequestParam(required = true) Double lat,
-            @RequestParam(required = true) Double lon) {
-        return serviceGroupWithArrivalsService.getServicesByPrefix(prefix, lat, lon);
+            @RequestParam(required = true) String prefix) {
+        return serviceGroupWithArrivalsService.getServicesByPrefix(prefix);
     }
 
     /**
@@ -60,7 +57,7 @@ public class ServiceController {
      * @return a list of service group responses
      */
     @GetMapping("/stop")
-    public List<BriefServiceResponse> getServicesAtStop(
+    public List<ServiceResponse> getServicesAtStop(
             @RequestParam(required = true) String id) {
         return serviceGroupWithArrivalsService.getServicesAtStop(id);
     }
@@ -78,7 +75,7 @@ public class ServiceController {
      * @return a list of service group responses
      */
     @GetMapping("/nearest")
-    public List<BriefServiceResponse> getNearestServices(
+    public List<ServiceResponse> getNearestServices(
             @RequestParam(required = true) Double lat,
             @RequestParam(required = true) Double lon) {
         return adjacentService.getAdjacentServices(lat, lon);

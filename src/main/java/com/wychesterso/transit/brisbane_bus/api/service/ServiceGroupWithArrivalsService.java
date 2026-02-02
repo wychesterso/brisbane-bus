@@ -2,10 +2,7 @@ package com.wychesterso.transit.brisbane_bus.api.service;
 
 import com.wychesterso.transit.brisbane_bus.api.cache.dto.ServiceGroupAtStopDTO;
 import com.wychesterso.transit.brisbane_bus.api.cache.dto.ServiceGroupDTO;
-import com.wychesterso.transit.brisbane_bus.api.controller.dto.ArrivalsAtStopResponse;
-import com.wychesterso.transit.brisbane_bus.api.controller.dto.BriefServiceResponse;
-import com.wychesterso.transit.brisbane_bus.api.controller.dto.BriefStopResponse;
-import com.wychesterso.transit.brisbane_bus.api.controller.dto.ServiceGroup;
+import com.wychesterso.transit.brisbane_bus.api.controller.dto.*;
 import com.wychesterso.transit.brisbane_bus.st.model.ServiceGroupKey;
 import org.springframework.stereotype.Service;
 
@@ -33,11 +30,11 @@ public class ServiceGroupWithArrivalsService {
      * @param prefix the prefix search term
      * @return list of services
      */
-    public List<BriefServiceResponse> getServicesByPrefix(String prefix, double lat, double lon) {
+    public List<BriefServiceResponse> getServicesByPrefix(String prefix) {
         if (prefix == null || prefix.isBlank()) return List.of();
 
         return serviceGroupService.getServicesByPrefix(prefix).stream()
-                .map(sg -> toResponseAtNearestStop(sg, lat, lon))
+                .map(this::toBriefResponse)
                 .toList();
     }
 
@@ -46,7 +43,7 @@ public class ServiceGroupWithArrivalsService {
      * @param stopId the stop to query
      * @return list of services
      */
-    public List<BriefServiceResponse> getServicesAtStop(String stopId) {
+    public List<ServiceResponse> getServicesAtStop(String stopId) {
         if (stopId == null || stopId.isBlank()) return List.of();
 
         return serviceGroupService.getServicesAtStop(stopId).stream()
@@ -61,7 +58,7 @@ public class ServiceGroupWithArrivalsService {
      * @param lon the origin longitude
      * @return list of services without duplicates, sorted by adjacency to origin
      */
-    public List<BriefServiceResponse> getServicesAtStops(List<String> stopIds, double lat, double lon) {
+    public List<ServiceResponse> getServicesAtStops(List<String> stopIds, double lat, double lon) {
         if (stopIds == null || stopIds.isEmpty()) return List.of();
 
         record Candidate(
@@ -112,12 +109,31 @@ public class ServiceGroupWithArrivalsService {
     // HELPERS
 
     /**
-     * Creates a BriefServiceResponse, using next 3 arrivals at the specified stop
+     * Creates a BriefServiceResponse
+     * @param dto the dto to convert to response
+     * @return a brief service response
+     */
+    private BriefServiceResponse toBriefResponse(
+            ServiceGroupDTO dto) {
+
+        return new BriefServiceResponse(
+                new ServiceGroup(
+                        dto.routeShortName(),
+                        dto.tripHeadsign(),
+                        dto.directionId()
+                ),
+                dto.routeShortName(),
+                dto.routeLongName()
+        );
+    }
+
+    /**
+     * Creates a ServiceResponse, using next 3 arrivals at the specified stop
      * @param dto the dto to convert to response
      * @param stopId the specified stop's id
      * @return a service response
      */
-    private BriefServiceResponse toResponseAtGivenStop(
+    private ServiceResponse toResponseAtGivenStop(
             ServiceGroupAtStopDTO dto,
             String stopId) {
 
@@ -128,7 +144,7 @@ public class ServiceGroupWithArrivalsService {
                 dto.directionId()
         );
 
-        return new BriefServiceResponse(
+        return new ServiceResponse(
                 new ServiceGroup(
                         dto.routeShortName(),
                         dto.tripHeadsign(),
@@ -141,13 +157,13 @@ public class ServiceGroupWithArrivalsService {
     }
 
     /**
-     * Creates a BriefServiceResponse, using next 3 arrivals at the nearest stop to given coordinate
+     * Creates a ServiceResponse, using next 3 arrivals at the nearest stop to given coordinate
      * @param dto the dto to convert to response
      * @param lat the coordinate's latitude
      * @param lon the coordinate's longitude
      * @return a service response
      */
-    private BriefServiceResponse toResponseAtNearestStop(
+    private ServiceResponse toResponseAtNearestStop(
             ServiceGroupDTO dto,
             double lat,
             double lon) {
@@ -166,7 +182,7 @@ public class ServiceGroupWithArrivalsService {
                 dto.directionId()
         );
 
-        return new BriefServiceResponse(
+        return new ServiceResponse(
                 new ServiceGroup(
                         dto.routeShortName(),
                         dto.tripHeadsign(),

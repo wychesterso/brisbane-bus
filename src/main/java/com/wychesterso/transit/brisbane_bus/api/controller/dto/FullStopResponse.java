@@ -4,5 +4,5 @@ import java.util.List;
 
 public record FullStopResponse(
         BriefStopResponse stopInfo,
-        List<BriefServiceResponse> services
+        List<ServiceResponse> services
 ) {}

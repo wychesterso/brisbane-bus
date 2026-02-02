@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 public class StopService {
 
-    private static final double LATDELTA = 0.009;
+    private static final double LATDELTA = 0.006;
     private static final double QUANTIZATION = 0.001;
 
     private final StopRepository repository;

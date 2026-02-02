@@ -77,8 +77,6 @@ public interface StopRepository extends JpaRepository<StopTime, String> {
                         r.route_short_name = :routeShortName
                         AND t.trip_headsign = :tripHeadsign
                         AND t.direction_id = :directionId
-                        AND s.stop_lat BETWEEN :minLat AND :maxLat
-                        AND s.stop_lon BETWEEN :minLon AND :maxLon
                     ORDER BY
                         POWER(s.stop_lat - :userLat, 2)
                         + POWER(s.stop_lon - :userLon, 2)

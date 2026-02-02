@@ -1,7 +1,8 @@
 package com.wychesterso.transit.brisbane_bus.api.controller.dto;
 
-public record BriefServiceResponse(
+public record ServiceResponse(
         ServiceGroup serviceGroup,
         String routeShortName,
-        String routeLongName
+        String routeLongName,
+        ArrivalsAtStopResponse arrivalsAtNearestStop
 ) {}
