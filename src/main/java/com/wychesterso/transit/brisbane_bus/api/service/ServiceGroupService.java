@@ -77,4 +77,25 @@ public class ServiceGroupService {
 
         return result;
     }
+
+    /**
+     * Get a list of pickup services at a particular stop
+     * @param stopId the stop to query
+     * @return list of services
+     */
+    public List<ServiceGroupAtStopDTO> getPickupServicesAtStop(String stopId) {
+        if (stopId == null || stopId.isBlank()) return List.of();
+
+        List<ServiceGroupAtStopDTO> result = cache.getPickupServicesAtStop(stopId);
+
+        if (result == null) {
+            result = repository.getPickupServicesAtStop(stopId)
+                    .stream()
+                    .map(ServiceGroupAtStopDTO::from)
+                    .toList();
+            cache.cachePickupServicesAtStop(stopId, result);
+        }
+
+        return result;
+    }
 }

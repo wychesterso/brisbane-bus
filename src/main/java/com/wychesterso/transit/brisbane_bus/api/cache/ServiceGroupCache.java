@@ -93,4 +93,27 @@ public class ServiceGroupCache {
     private String getServicesAtStopKey(String stopId) {
         return "stop:" + stopId + ":services";
     }
+
+    public List<ServiceGroupAtStopDTO> getPickupServicesAtStop(String stopId) {
+        String key = getPickupServicesAtStopKey(stopId);
+
+        @SuppressWarnings("unchecked")
+        ServiceGroupAtStopList cached = (ServiceGroupAtStopList) redis.opsForValue().get(key);
+
+        if (cached != null) return cached.serviceGroupAtStopList();
+        return null;
+    }
+
+    public void cachePickupServicesAtStop(String stopId, List<ServiceGroupAtStopDTO> result) {
+        String key = getPickupServicesAtStopKey(stopId);
+
+        redis.opsForValue().set(
+                key,
+                new ServiceGroupAtStopList(result),
+                TTL);
+    }
+
+    private String getPickupServicesAtStopKey(String stopId) {
+        return "stop:" + stopId + ":services-pickup";
+    }
 }

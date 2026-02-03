@@ -81,4 +81,30 @@ public interface ServiceGroupRepository extends JpaRepository<StopTime, String> 
     List<ServiceGroupAtStop> getServicesAtStop(
             @Param("stopId") String stopId
     );
+
+    @Query(
+            value = """
+                    SELECT DISTINCT
+                        r.route_short_name AS routeShortName,
+                        r.route_long_name AS routeLongName,
+                        t.trip_headsign AS tripHeadsign,
+                        t.direction_id AS directionId,
+                        r.route_color AS routeColor,
+                        r.route_text_color AS routeTextColor,
+                        st.stop_id AS stopId,
+                        s.stop_lat AS stopLat,
+                        s.stop_lon AS stopLon
+                    FROM routes r
+                    JOIN trips t ON r.route_id = t.route_id
+                    JOIN stop_times st ON t.trip_id = st.trip_id
+                    JOIN stops s ON st.stop_id = s.stop_id
+                    WHERE st.stop_id = :stopId
+                        AND st.pickup_type = 0
+                    ORDER BY r.route_short_name;
+                    """,
+            nativeQuery = true
+    )
+    List<ServiceGroupAtStop> getPickupServicesAtStop(
+            @Param("stopId") String stopId
+    );
 }

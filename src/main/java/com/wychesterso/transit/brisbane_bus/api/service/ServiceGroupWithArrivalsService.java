@@ -69,7 +69,7 @@ public class ServiceGroupWithArrivalsService {
         Map<ServiceGroupKey, Candidate> closestPerService = new HashMap<>();
 
         for (String stopId : new HashSet<>(stopIds)) {
-            List<ServiceGroupAtStopDTO> serviceGroupsAtStop = serviceGroupService.getServicesAtStop(stopId);
+            List<ServiceGroupAtStopDTO> serviceGroupsAtStop = serviceGroupService.getPickupServicesAtStop(stopId);
 
             for (ServiceGroupAtStopDTO sg : serviceGroupsAtStop) {
                 double distance = squaredDistance(
